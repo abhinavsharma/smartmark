@@ -27,17 +27,48 @@ const Ci = Components.interfaces;
 const global = this;
 
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+Cu.import("resource://services-sync/util.js");
+
+function SmartMarkUtils() {
+  Cu.reportError("smartmark utils init");
+  let me = this;
+}
+
+SmartMarkUtils.prototype.getPIDFromBID = function(bookmarkId) {
+  Cu.reportError("lookup pid for bid" + bookmarkId);
+  let me = this;
+  let stm = Svc.History.DBConnection.createAsyncStatement(
+    "SELECT fk FROM moz_bookmarks WHERE id = :bookmarkId;");
+  Cu.reportError("statement createed");
+  stm.params.bookmarkId = bookmarkId;
+  let placeId = 0;
+  Cu.reportError("going to exec query");
+  Utils.queryAsync(stm, ["fk"]).forEach(function({fk}) {
+    placeId = fk;
+  });
+  Cu.reportError("returning pid" + placeId);
+  return placeId;
+}
 
 function SmartMark() {
   Components.utils.reportError("smartmark init");
   let me = this;
+  me.utils = new SmartMarkUtils();
   me.bmsvc = Cc["@mozilla.org/browser/nav-bookmarks-service;1"]
              .getService(Ci.nsINavBookmarksService);
   me.bookmarkListener = {
     onItemAdded: function(aItemId, aFolder, aIndex) {
-      Cu.reportError("Yay, bookmark added");
       me.handleSmartmark(aItemId);
     },
+
+    onItemChanged: function(){},
+    onItemRemoved: function() {},
+    onItemVisited: function(){},
+    onBeginUpdateBatch: function() {},
+    onItemMoved: function(){},
+    onBeforeItemRemoved: function(){},
+    onBeginUpdateBatch: function() {},
+    onEndUpdateBatch: function(){},
 
     QueryInterface: XPCOMUtils.generateQI([Ci.nsINavBookmarkObserver])
   };
@@ -50,8 +81,9 @@ SmartMark.prototype.kill = function() {
 }
 
 SmartMark.prototype.handleSmartmark = function(aItemId) {
-  Cu.reportError("Handle Smartmark");
+  Cu.reportError("Handle Smartmark" + aItemId);
   let me = this;
+  let placeId = me.utils.getPIDFromBID(aItemId);
 };
 
 function startup(data, reason) {
