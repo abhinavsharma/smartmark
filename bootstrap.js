@@ -37,8 +37,48 @@ SmartMarkUtils.prototype.getData = function(fields, conditions, table) {
 
 SmartMarkUtils.prototype.getPIDFromBID = function(bookmarkId) {
   let me = this;
-  return me.getData(["fk"], {"id":bookmarkId}, "moz_bookmarks")[0][fk];
-  return placeId;
+  return me.getData(["fk"], {"id":bookmarkId}, "moz_bookmarks")[0]["fk"];
+};
+
+SmartMarkUtils.prototype.mergeCountDicts = function(d1, d2) {
+  let d = {};
+  for (let k1 in d1) {
+    d[k1] = d1[k1]
+  }
+  for (let k2 in d2) {
+    if (k2 in d) {
+      d[k2] += d2[k2];
+    } else {
+      d[k2] = d2[k2];
+    }
+  }
+  return d;
+};
+
+SmartMarkUtils.prototype.getSearchTagsRecursive = function(hid) {
+  if (hid == 0) {
+    return {};
+  }
+
+  // get url and title, extract tags, return tf dict
+  // if has keywords, return tf dict
+  // otherwise, recurse on from_visit
+};
+
+SmartMarkUtils.prototype.getTagsFromHIDS = function(hids) {
+  let keys = {};
+  hids.forEach(function(hid) {
+    let newKeys = me.getSearchTagsRecursive(hid);
+    keys = me.mergeCountDicts(keys, newKeys);
+  });
+  return keys;
+};
+
+SmartMarkUtils.prototype.getSearchTags = function(placeId) {
+  let me = this;
+  let hids = me.getData(["id"], {"place_id":placeId}, "moz_historyvisits")
+             .map(function(elem) {return elem["id"]});
+  return me.getTagsFromHIDS(hids);
 };
 
 function SmartMark() {
