@@ -206,6 +206,12 @@ SmartMark.prototype.handleSmartmark = function(aItemId) {
   Cu.reportError("place ID is " + placeId);
   let searchTags = me.utils.getSearchTags(placeId);
   Cu.reportError(JSON.stringify(searchTags));
+  let tagArray = [];
+  for (let k in searchTags) {
+    tagArray.push(k);
+  }
+  let bookmarkURI = me.bmsvc.getBookmarkURI(aItemId);
+  me.tagsvc.tagURI(bookmarkURI, tagArray);
 };
 
 function startup(data, reason) {
