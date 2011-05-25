@@ -1,26 +1,3 @@
-/*
-SCRIPTS = ["smartmark"];
-const Cc = Components.classes;
-
-function SmartMark() {
-  Cu.reportError("starting smartmark");
-  let me = this;
-  let bmsvc = Cc["@mozilla.org/browser/bookmarks-service;1"]
-             .getService(Ci.nsIBookmarksService);
-  me.bookmarkListener = {};
-  me.bmsvc.addObserver(me.bookmarkListener);
-}
-
-SmartMark.prototype.kill = function() {
-  Cu.reportError("killing smartmark");
-  me.bmsvc.removeObserver(me.bookmarkListener);
-};
-
-SmartMark.prototype.hello = function() {
-  Cu.reportError("Hello");
-};
-*/
-
 const Cu = Components.utils;
 const Cc = Components.classes;
 const Ci = Components.interfaces;
