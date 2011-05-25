@@ -34,21 +34,35 @@ function SmartMarkUtils() {
   let me = this;
 }
 
-SmartMarkUtils.prototype.getPIDFromBID = function(bookmarkId) {
-  Cu.reportError("lookup pid for bid" + bookmarkId);
+SmartMarkUtils.prototype.getData = function(fields, conditions, table) {
+  //Cu.reportError("looking for data");
   let me = this;
-  let stm = Svc.History.DBConnection.createAsyncStatement(
-    "SELECT fk FROM moz_bookmarks WHERE id = :bookmarkId;");
-  Cu.reportError("statement createed");
-  stm.params.bookmarkId = bookmarkId;
-  let placeId = 0;
-  Cu.reportError("going to exec query");
-  Utils.queryAsync(stm, ["fk"]).forEach(function({fk}) {
-    placeId = fk;
+  let queryString = "SELECT ";
+  queryString += fields.join(',') + ' FROM ' + table + ' WHERE ';
+  for (let key in conditions) {
+    queryString += key + " = :" + key;
+  }
+  //Cu.reportError("query string constructed" + queryString);
+  let stm = Svc.History.DBConnection.createAsyncStatement(queryString);
+  //Cu.reportError("statement created, parametrizing");
+  for (let k in  conditions) {
+    stm.params[k] = conditions[k];
+  }
+  //Cu.reportError("params are" + JSON.stringify(stm.params));
+  let ret = [];
+  //Cu.reportError("executing statement");
+  Utils.queryAsync(stm, fields).forEach(function(row) {
+    ret.push(row);
   });
-  Cu.reportError("returning pid" + placeId);
+  //Cu.reportError("returing " + JSON.stringify(ret));
+  return ret;
+};
+
+SmartMarkUtils.prototype.getPIDFromBID = function(bookmarkId) {
+  let me = this;
+  return me.getData(["fk"], {"id":bookmarkId}, "moz_bookmarks")[0][fk];
   return placeId;
-}
+};
 
 function SmartMark() {
   Components.utils.reportError("smartmark init");
