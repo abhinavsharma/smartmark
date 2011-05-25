@@ -55,6 +55,10 @@ SmartMarkUtils.prototype.mergeCountDicts = function(d1, d2) {
   return d;
 };
 
+SmartMarkUtils.prototype.getTagsFromPID = function(placeId) {
+  
+};
+
 SmartMarkUtils.prototype.getSearchTagsRecursive = function(hid) {
   if (hid == 0) {
     return {};
@@ -87,6 +91,8 @@ function SmartMark() {
   me.utils = new SmartMarkUtils();
   me.bmsvc = Cc["@mozilla.org/browser/nav-bookmarks-service;1"]
              .getService(Ci.nsINavBookmarksService);
+  me.tagsvc = Cc["@mozilla.org/browser/tagging-service;1"]
+              .getService(Ci.nsITaggingService);
   me.bookmarkListener = {
     onItemAdded: function(aItemId, aFolder, aIndex) {
       me.handleSmartmark(aItemId);
